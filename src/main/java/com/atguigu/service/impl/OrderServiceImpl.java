@@ -41,6 +41,9 @@ public class OrderServiceImpl implements OrderService {
         order.setUserId(userId);
         orderDAO.saveOrder(order);
 
+        // 模拟出现异常，测试事务
+        int i = 12 / 0;
+
         // 将购物车中的每项存入t_order_item中
         for (Map.Entry<Integer, CartItem> entry : cart.getItems().entrySet()){
             orderItemDAO.saveOrderItem(entry.getValue(), OrderId);

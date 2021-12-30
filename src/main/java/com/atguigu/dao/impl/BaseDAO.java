@@ -43,10 +43,10 @@ public abstract class BaseDAO<T> {
         try {
             Connection conn = JDBCUtils.getConnection();
             return queryRunner.update(conn, sql, args);
-        } catch (SQLException throwables) {
+        } catch (Exception throwables) {
             throwables.printStackTrace();
+            throw new RuntimeException(throwables);
         }
-        return -1;
     }
 
     public T queryForOne(String sql, Object ... args){
@@ -54,12 +54,14 @@ public abstract class BaseDAO<T> {
         try {
             conn = JDBCUtils.getConnection();
             return (T) queryRunner.query(conn, sql, new BeanHandler<>(clazz), args);
-        } catch (SQLException throwables) {
+        } catch (Exception throwables) {
             throwables.printStackTrace();
+            throw new RuntimeException(throwables);
         } finally {
-            JDBCUtils.closeResource(conn, null);
+            // version 1.0：未考虑事务
+            // 考虑事务需要将关闭连接放到servlet层做，即所有操作无异常后即可提交
+            // JDBCUtils.closeResource(conn, null);
         }
-        return null;
     }
 
     public List<T> queryForList(String sql, Object ... args){
@@ -68,12 +70,13 @@ public abstract class BaseDAO<T> {
             conn = JDBCUtils.getConnection();
             List<T> query = (List<T>) queryRunner.query(conn, sql, new BeanListHandler<>(clazz), args);
             return query;
-        } catch (SQLException throwables) {
+        } catch (Exception throwables) {
             throwables.printStackTrace();
+            throw new RuntimeException(throwables);
         } finally {
-            JDBCUtils.closeResource(conn, null);
+            // version 1.0：未考虑事务
+            // JDBCUtils.closeResource(conn, null);
         }
-        return null;
     }
 
     public Object queryForSingleValue(String sql, Object ... args){
@@ -81,11 +84,12 @@ public abstract class BaseDAO<T> {
         try {
             conn = JDBCUtils.getConnection();
             return queryRunner.query(conn, sql, new ScalarHandler(), args);
-        } catch (SQLException throwables) {
+        } catch (Exception throwables) {
             throwables.printStackTrace();
+            throw new RuntimeException(throwables);
         } finally {
-            JDBCUtils.closeResource(conn, null);
+            // version 1.0：未考虑事务
+            // JDBCUtils.closeResource(conn, null);
         }
-        return null;
     }
 }

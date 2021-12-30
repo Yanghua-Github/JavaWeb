@@ -19,7 +19,7 @@ public class JDBCUtilsTest {
         try {
             Connection conn = JDBCUtils.getConnection();
             System.out.println("conn = " + conn);
-        } catch (SQLException throwables) {
+        } catch (Exception throwables) {
             throwables.printStackTrace();
         }
     }

@@ -20,7 +20,7 @@ import java.io.IOException;
 public class CartServlet extends BaseServlet {
     BookService bookService = new BookServiceImpl();
 
-    protected void addItem(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void addItem(HttpServletRequest request, HttpServletResponse response) throws Exception {
         int id = WebUtils.parseInt(request.getParameter("id"), 0);
         Cart cart = (Cart) request.getSession().getAttribute("cart");
 
