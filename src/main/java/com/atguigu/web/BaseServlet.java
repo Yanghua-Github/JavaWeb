@@ -19,6 +19,7 @@ public abstract class BaseServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         // 设置响应字符集为UTF-8
         response.setContentType("text/html; charset=UTF-8");
         // 方式三：采用抽象类，所有Serverlet程序继承此抽象类，

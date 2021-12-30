@@ -1,3 +1,4 @@
+<%@ page import="com.atguigu.web.CartServlet" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -6,13 +7,35 @@
 <meta charset="UTF-8">
 <title>书城首页</title>
 	<%--	静态包含头部脚本--%>
-	<%@include file="/pages/common/head.jsp"%>
+	<%@ include file="/pages/common/head.jsp"%>
 	<script type="text/javascript">
 		$(function () {
+			$.ajaxSetup( {
+				//设置ajax请求结束后的执行动作
+				complete : function(XMLHttpRequest, textStatus) {
+					alert("lddllldldld");
+					// 通过XMLHttpRequest取得响应头，REDIRECT
+					var enable = XMLHttpRequest.getResponseHeader("enableRedirect");//若HEADER中含有REDIRECT说明后端想重定向
+					if (enable == "true") {
+						var win = window;
+						while (win != win.top){
+							win = win.top;
+						}
+						//将后端重定向的地址取出来,使用win.location.href去实现重定向的要求
+						win.location.href= XMLHttpRequest.getResponseHeader("redirectUrl");
+					}
+				}
+			});
+
 			$(".addCartBtn").click(function () {
 				var id = $(this).attr("bookId");
-				// todo
-				location.href = "<%=basePath%>" + "CartServlet?action=addItem&id=" + id;
+				// 方式1：刷新页面
+				<%--location.href = "<%=basePath%>" + "CartServlet?action=addItem&id=" + id;--%>
+				// 方式2：使用Ajax进行局部更新
+				$.getJSON("<%=basePath%>CartServlet", "action=ajaxAddItem&id=" + id, function (data) {
+					$("div.book_sales.sp2").innerText(data.book.sales);
+					$("div.book_amount.sp2").innerText(data.book.stock);
+				});
 			});
 		})
 	</script>

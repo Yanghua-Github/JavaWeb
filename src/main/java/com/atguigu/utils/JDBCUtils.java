@@ -80,36 +80,40 @@ public class JDBCUtils {
     public static void closeAndCommit(){
         Connection conn = conns.get();
         // 提交事务
-        try {
-            conn.commit();
-        } catch (Exception throwables) {
-            throwables.printStackTrace();
-        } finally {
-            // 关闭连接
+        if(conn != null){
             try {
-                conn.close();
+                conn.commit();
             } catch (Exception throwables) {
                 throwables.printStackTrace();
+            } finally {
+                // 关闭连接
+                try {
+                    conn.close();
+                } catch (Exception throwables) {
+                    throwables.printStackTrace();
+                }
             }
+            // 一定要执行remove操作，否则就会出错。（因为Tomcat服务器底层使用了线程池技术）
         }
-        // 一定要执行remove操作，否则就会出错。（因为Tomcat服务器底层使用了线程池技术）
         conns.remove();
     }
 
     // version2.0 : 考虑事务
     public static void closeAndRollback(){
         Connection conn = conns.get();
-        // 提交事务
-        try {
-            conn.rollback();
-        } catch (Exception throwables) {
-            throwables.printStackTrace();
-        } finally {
-            // 关闭连接
+        if(conn != null){
+            // 提交事务
             try {
-                conn.close();
+                conn.rollback();
             } catch (Exception throwables) {
                 throwables.printStackTrace();
+            } finally {
+                // 关闭连接
+                try {
+                    conn.close();
+                } catch (Exception throwables) {
+                    throwables.printStackTrace();
+                }
             }
         }
         // 一定要执行remove操作，否则就会出错。（因为Tomcat服务器底层使用了线程池技术）

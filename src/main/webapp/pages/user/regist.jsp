@@ -6,6 +6,7 @@
 <title>尚硅谷会员注册页面</title>
 	<%--	静态包含头部脚本--%>
 	<%@include file="/pages/common/head.jsp"%>
+	<script src="/common/redirect.js"></script>
 	<script type="text/javascript">
 		// 页面加载完成之后
 		$(function () {
@@ -48,6 +49,27 @@
 				$("span.errorMsg").text("");
 				return true;
 			});
+
+			// 给验证码的图片，绑定单击事件
+			$("#code_img").click(function () {
+				// 在事件响应的function函数中有一个this对象。这个this对象，是当前正在响应事件的dom对象
+				// src属性表示验证码img标签的 图片路径。它可读，可写
+				// alert(this.src);
+				this.src = "${basePath}kaptcha.jpg?d=" + new Date();
+			});
+
+			$("#username").blur(function () {
+				//1 获取用户名
+				var username = this.value;
+				$.getJSON("<%=basePath%>UserServlet", "action=ajaxExistUsername&username=" + username,function (data) {
+					if (data.existsUsername) {
+						$("span.errorMsg").text("用户名已存在！");
+					} else {
+						$("span.errorMsg").text("用户名可用！");
+					}
+				});
+			});
+
 		});
 	</script>
 <style type="text/css">
@@ -105,7 +127,7 @@
 									<br />
 									<label>验证码：</label>
 									<input class="itxt" type="text" style="width: 120px;" name="code" id="code"/>
-									<img alt="" src="kaptcha.jpg" style="float: right; margin-right: 40px; width: 120px">
+									<img alt="" id="code_img" src="kaptcha.jpg" style="float: right; margin-right: 40px; width: 120px">
 									<br />
 									<br />
 									<input type="submit" value="注册" id="sub_btn" />

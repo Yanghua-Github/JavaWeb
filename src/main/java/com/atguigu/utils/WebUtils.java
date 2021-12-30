@@ -2,6 +2,8 @@ package com.atguigu.utils;
 
 import org.apache.commons.beanutils.BeanUtils;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
@@ -28,5 +30,18 @@ public class WebUtils {
             e.printStackTrace();
         }
         return defaultValue;
+    }
+
+
+    public static void sendRedirect(HttpServletResponse response, String redirectUrl){
+        try {//这里并不是设置跳转页面，而是将重定向的地址发给前端，让前端执行重定向
+            //设置跳转地址
+            response.setHeader("redirectUrl", redirectUrl);
+            //设置跳转使能
+            response.setHeader("enableRedirect","true");
+            response.flushBuffer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

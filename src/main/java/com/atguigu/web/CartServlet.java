@@ -9,12 +9,16 @@ import com.atguigu.pojo.CartItem;
 import com.atguigu.service.BookService;
 import com.atguigu.service.impl.BookServiceImpl;
 import com.atguigu.utils.WebUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpPrincipal;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name = "CartServlet", value = "/CartServlet")
 public class CartServlet extends BaseServlet {
@@ -39,6 +43,41 @@ public class CartServlet extends BaseServlet {
         bookService.updateBook(book);
         // 重定向到当前页面
         response.sendRedirect(request.getHeader("Referer"));
+    }
+
+    protected void ajaxAddItem(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        int id = WebUtils.parseInt(request.getParameter("id"), 0);
+        Cart cart = (Cart) request.getSession().getAttribute("cart");
+
+        System.out.println("ajaxAddItem开始执行");
+        if(cart == null){
+            // todo : 没有完成ajax重定向
+            // 如果cart为空，说明用户未登录，跳转到登陆页面
+//            WebUtils.sendRedirect(response,request.getContextPath() + "/pages/user/login.jsp");
+//            response.sendRedirect(request.getContextPath() + "/pages/user/login.jsp");
+            // 方式2: 使用Json传送数据，并使用ajax进行更新
+            Map<String, String> redirectMap = new HashMap<>();
+            redirectMap.put("url", request.getContextPath() + "/pages/user/login.jsp");
+            Gson gson = new Gson();
+            String toJson = gson.toJson(redirectMap, new TypeToken<HashMap<String, String>>(){}.getType());
+            response.getWriter().write(toJson);
+
+            return;
+        }
+        Book book = bookService.queryBookById(id);
+        CartItem item = new CartItem(book.getName(), 1, book.getPrice(), book.getId());
+
+        cart.addItem(item);
+        // 每次点击加入购物车后，更新书籍的销量及库存
+        book.setStock(book.getStock() - 1);
+        book.setSales(book.getSales() + 1);
+        bookService.updateBook(book);
+        // 方式1:重定向到当前页面
+//        response.sendRedirect(request.getHeader("Referer"));
+        // 方式2: 使用Json传送数据，并使用ajax进行更新
+        Gson gson = new Gson();
+        String toJson = gson.toJson(book, Book.class);
+        response.getWriter().write(toJson);
     }
 
     protected void deleteItem(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -6,11 +6,15 @@ package com.atguigu.web; /**
 import com.atguigu.pojo.Cart;
 import com.atguigu.pojo.User;
 import com.atguigu.service.impl.UserServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.atguigu.utils.WebUtils.copyParamToBean;
 import static com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY;
@@ -80,4 +84,20 @@ public class UserServlet extends BaseServlet {
         request.getSession().invalidate();
         response.sendRedirect(request.getContextPath());;
     }
+
+    protected void ajaxExistUsername(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // 获取请求的参数username
+        String username = request.getParameter("username");
+        // 调用userService.existsUsername();
+        boolean existsUsername = userServiceImpl.existUsername(username);
+        // 把返回的结果封装成为map对象
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put("existsUsername",existsUsername);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(resultMap);
+
+        response.getWriter().write(json);
+    }
+
 }
